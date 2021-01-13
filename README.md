@@ -39,14 +39,14 @@ Here are some advanced navigation hotkeys that may be useful in problem list buf
 
 | Keymap | Command                                    | Description                         |
 |--------|--------------------------------------------|-------------------------------------|
-| o      | `leetcode-show-problem`                    | show/open the current problem       |
-| O      | `leetcode-show-current-problem`            | show/open a problem by id           |
-| v      | `leetcode-view-problem`                    | view the current problem            |
-| V      | `leetcode-view-current-problem`            | view a problem by id                |
-| b      | `leetcode-show-problem-in-browser`         | show the current problem in browser |
-| B      | `leetcode-show-current-problem-in-browser` | show a problem by id in browser     |
-| c      | `leetcode-solve-problem`                   | start coding the current problem    |
-| C      | `leetcode-solve-current-problem`           | start coding a problem by id        |
+| o      | `leetcode-show-current-problem`            | show/open the current problem       |
+| O      | `leetcode-show-problem`                    | show/open a problem by id           |
+| v      | `leetcode-view-current-problem`            | view the current problem            |
+| V      | `leetcode-view-problem`                    | view a problem by id                |
+| b      | `leetcode-show-current-problem-in-browser` | show the current problem in browser |
+| B      | `leetcode-show-problem-in-browser`         | show a problem by id in browser     |
+| c      | `leetcode-solve-current-problem`           | start coding the current problem    |
+| C      | `leetcode-solve-problem`                   | start coding a problem by id        |
 
 # Installation
 
