@@ -17,6 +17,7 @@ LeetCode brings you offer, and now Emacs brings you LeetCode!
 | s      | filter problems by regex               |
 | t      | filter problems by tag                 |
 | d      | filter problems by difficulty          |
+| o      | filter out accepted and paid problems  |
 | /      | clear filters                          |
 | g      | refresh without fetching from LeetCode |
 | G      | refresh all data                       |
