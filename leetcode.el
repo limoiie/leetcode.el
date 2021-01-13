@@ -126,6 +126,7 @@ The elements of :problems has attributes:
 (defvar leetcode--filter-tag nil "Filter rows by tag.")
 (defvar leetcode--filter-difficulty nil
   "Filter rows by difficulty, it can be \"easy\", \"medium\" and \"hard\".")
+(defvar leetcode--filter-todo nil "Filter out accepted or locked rows.")
 (defconst leetcode--all-difficulties '("easy" "medium" "hard"))
 
 (defconst leetcode--paid "•" "Paid mark.")
@@ -473,7 +474,8 @@ Return a list of rows, each row is a vector:
   (aref row 4))
 
 (defun leetcode--filter (rows)
-  "Filter ROWS by `leetcode--filter-regex', `leetcode--filter-tag' and `leetcode--filter-difficulty'."
+  "Filter ROWS by `leetcode--filter-regex', `leetcode--filter-tag', \
+`leetcode--filter-difficulty' and `leetcode--filter-todo'."
   (leetcode--debug "filter rows: %s" rows)
   (seq-filter
    (lambda (row)
@@ -489,7 +491,15 @@ Return a list of rows, each row is a vector:
       (if leetcode--filter-difficulty
           (let ((difficulty (leetcode--row-difficulty row)))
             (string= difficulty leetcode--filter-difficulty))
-        t)))
+        t)
+      (if leetcode--filter-todo
+          (let ((accepted (aref row 0))
+		(title    (aref row 2)))
+	    (and
+	     (string= accepted " ")
+	     (not (s-suffix? leetcode--paid title))))
+        t)
+      ))
    rows))
 
 (defun leetcode-reset-filter ()
@@ -498,6 +508,7 @@ Return a list of rows, each row is a vector:
   (setq leetcode--filter-regex nil)
   (setq leetcode--filter-tag nil)
   (setq leetcode--filter-difficulty nil)
+  (setq leetcode--filter-todo nil)
   (leetcode-refresh))
 
 (defun leetcode-set-filter-regex (regex)
@@ -525,6 +536,12 @@ Return a list of rows, each row is a vector:
   (interactive)
   (setq leetcode--filter-difficulty
         (completing-read "Difficulty: " leetcode--all-difficulties))
+  (leetcode-refresh))
+
+(defun leetcode-set-filter-todo ()
+  "Set `leetcode--filter-todo' as true and refresh."
+  (interactive)
+  (setq leetcode--filter-todo t)
   (leetcode-refresh))
 
 (aio-defun leetcode--fetch-all-tags ()
@@ -1072,6 +1089,7 @@ for current problem."
       (define-key map "l" #'leetcode-set-prefer-language)
       (define-key map "t" #'leetcode-set-filter-tag)
       (define-key map "d" #'leetcode-set-filter-difficulty)
+      (define-key map "o" #'leetcode-set-filter-todo)
       (define-key map "g" #'leetcode-refresh)
       (define-key map "G" #'leetcode-refresh-fetch)
       (define-key map "/" #'leetcode-reset-filter)
