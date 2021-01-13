@@ -86,23 +86,23 @@ You can save solution by setting `leetcode-save-solutions`:
 (setq leetcode-directory "~/leetcode")
 ```
 
-You can specify code template by setting `leetcode-template-directory`:
+You can specify code templates by setting `leetcode-template-directory`:
 
 ```elisp
 (setq leetcode-template-directory "~/leetcode/templates")
 ;; Any file with the lang as the basename in this directory will be taken
 ;; as the template for that lang.  For example, both file `cpp.cpp` and
-;; file `cpp.cc` represents the template for cpp (so please avoid using
+;; file `cpp.cc` represent the template for cpp (so please avoid using
 ;; them at the same time).  In each template file, the string token
 ;; `leetcode-code-placeholder` will be replaced with the code snippet
 ;; that fetched from the leetcode when starting coding.
 ```
 
-And a code template file would be like this:
+And a code template file for example would be something like this:
 ```
-#ifdef __APPLE__
+#ifdef __ON_MY_PC__
 #include "base.h"
-#endif  // __APPLE__
+#endif  // __ON_MY_PC__
 
 
 $%CODE%$  // the default value for `leetcode-code-placeholder`
