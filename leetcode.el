@@ -188,6 +188,12 @@ The elements of :problems has attributes:
   "Convert VEC to list."
   (append vec '()))
 
+(defun read-file (filepath)
+  "Return the contents of FILEPATH as a string."
+  (with-temp-buffer
+    (insert-file-contents filepath)
+    (buffer-string)))
+
 (defun leetcode--referer (value)
   "It will return an alist as the HTTP Referer Header.
 VALUE should be the referer."
@@ -949,6 +955,15 @@ mysql, mssql, oraclesql.")
 (defvar leetcode-directory "~/leetcode"
   "Directory to save solutions.")
 
+(defvar leetcode-template-directory "~/leetcode/templates"
+  "Directory where stores the code templates.
+The file with the lang as the basename in this directory will be taken
+as the template for that lang.  For example, both file `cpp.cpp' and
+file `cpp.cc' represents the template for cpp (so please avoid using
+them at the same time).  In each template file, the string token
+`leetcode-code-placeholder' will be replaced with the code snippet
+that fetched from the leetcode when starting coding.")
+
 (defvar leetcode-save-solutions nil
   "If it's t, save leetcode solutions to `leetcode-directory'.")
 
@@ -976,6 +991,43 @@ python3, ruby, rust, scala, swift, mysql, mssql, oraclesql.")
                       snippets)
             leetcode-prefer-sql
           leetcode-prefer-language)))
+
+(defun leetcode--has-lang (lang)
+  "Check if LANG is valid by finding in the `leetcode--lang-suffixes'."
+  (not (equal nil (alist-get lang leetcode--lang-suffixes nil nil 'equal))))
+
+(defconst leetcode-code-placeholder "$%CODE%$"
+  "The placeholder used in code template.
+This placeholder will be replaced with the code snippet that fetched
+from the leetcode when starting coding.")
+
+(defun leetcode--load-code-templates ()
+  "Load code templates from `leetcode-template-directory'."
+  (let ((code-templates '()))
+    (when (file-directory-p leetcode-template-directory)
+      (mapc (lambda (template-file)
+	      (let ((lang (file-name-base template-file)))
+		(if (not (leetcode--has-lang lang))
+		    (message "Not supported language: %s! Just ignored." lang)
+		  (setf (alist-get lang code-templates nil nil 'equal) template-file))))
+	    ;; filter out those files that ends with ~ and ., which in most cases
+	    ;; are emacs' temp files or the dot folders (. and ..).
+	    (directory-files leetcode-template-directory t "[^~.]$")))
+    code-templates))
+
+(defun leetcode--inflate-code-template (lang snippet)
+  "Inflate the code template of LANG with SNIPPET.
+Replace the `leetcode-code-placeholder' in the templace with SNIPPET if
+exists.  Otherwise, append the SNIPPET at the end of template.  By the
+way, if the original template is an existing file path, then the template
+will be read from that file."
+  (let* ((code-templates (leetcode--load-code-templates))
+	 (code-template (alist-get lang code-templates "" nil 'equal)))
+    (when (file-regular-p code-template)
+      (setq code-template (read-file code-template)))
+    (if (cl-search leetcode-code-placeholder code-template)
+	(s-replace leetcode-code-placeholder snippet code-template)
+      (s-concat code-template snippet))))
 
 (defun leetcode--get-code-buffer-name (title)
   "Get code buffer name by TITLE and `leetcode-prefer-language'."
@@ -1036,11 +1088,10 @@ for current problem."
                                     (equal (alist-get 'langSlug s)
                                            leetcode--lang))
                                   snippets))
-               (template-code (alist-get 'code snippet)))
-          (unless (save-mark-and-excursion
-                    (goto-char (point-min))
-                    (search-forward (string-trim template-code) nil t))
-            (insert template-code))
+               (snippet-code (alist-get 'code snippet))
+	       (template-code (leetcode--inflate-code-template leetcode--lang snippet-code)))
+	  (when (= (buffer-size code-buf) 0)
+	    (insert template-code))
           (leetcode--replace-in-buffer "" ""))))
 
     (display-buffer code-buf
