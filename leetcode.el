@@ -1136,6 +1136,8 @@ for current problem."
       (define-key map (kbd "RET") #'leetcode-show-current-problem)
       (define-key map "n" #'next-line)
       (define-key map "p" #'previous-line)
+      (define-key map "N" #'scroll-up-command)
+      (define-key map "P" #'scroll-down-command)
       (define-key map "s" #'leetcode-set-filter-regex)
       (define-key map "l" #'leetcode-set-prefer-language)
       (define-key map "t" #'leetcode-set-filter-tag)
@@ -1160,6 +1162,8 @@ for current problem."
   (let ((map (make-sparse-keymap)))
     (prog1 map
       (suppress-keymap map)
+      (define-key map (kbd "TAB") #'forward-button)
+      (define-key map (kbd "S-TAB") #'backward-button)
       (define-key map "n" #'next-line)
       (define-key map "p" #'previous-line)))
   "Keymap for `leetcode--problem-description-mode'.")
